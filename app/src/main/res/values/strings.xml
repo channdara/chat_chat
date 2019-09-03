@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Chat Chat</string>
+    <string name="log_in">Log In</string>
+    <string name="email_address">Email Address</string>
+    <string name="password">Password</string>
+    <string name="forgot_password_q">Forgot Password?</string>
+    <string name="or_register_q">or Register?</string>
+    <string name="username">Username</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="register">Register</string>
+    <string name="register_note"><b>Note</b>: Make sure your email address is correct because we will send a confirm link to your email. Thank you!</string>
+    <string name="get_photo_from_camera_or_gallery">Get photo from camera or gallery</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
+
+    <string name="error_unknown_error">Unknown Error</string>
+    <string name="clear">Clear</string>
+</resources>

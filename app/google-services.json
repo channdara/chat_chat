@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "293334169429",
+    "firebase_url": "https://chatchat-daa44.firebaseio.com",
+    "project_id": "chatchat-daa44",
+    "storage_bucket": "chatchat-daa44.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:293334169429:android:6a0239d1d38f0044",
+        "android_client_info": {
+          "package_name": "com.mastertipsy.chat_chat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "293334169429-0obesfv3ga9itr0cvd47kp074crkv7ee.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mastertipsy.chat_chat",
+            "certificate_hash": "3c482b488c1a3d7754ed1ab8d838d0a850b130cb"
+          }
+        },
+        {
+          "client_id": "293334169429-d115h34f61go00irbjmtpku42krgdupp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDPH5ze1P9upikgGgGnWhw6pPITtBGtZ5Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "293334169429-d115h34f61go00irbjmtpku42krgdupp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
