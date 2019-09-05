@@ -9,8 +9,8 @@ import androidx.core.content.ContextCompat
 
 class PermissionUtil {
     companion object {
-        private val permissionGranted = PackageManager.PERMISSION_GRANTED
-        private val permissionCamera = Manifest.permission.CAMERA
+        private const val permissionGranted = PackageManager.PERMISSION_GRANTED
+        private const val permissionCamera = Manifest.permission.CAMERA
 
         fun isCameraGranted(context: Context): Boolean =
             ContextCompat.checkSelfPermission(context, permissionCamera) == permissionGranted

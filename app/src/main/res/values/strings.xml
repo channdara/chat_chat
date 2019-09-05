@@ -1,4 +1,14 @@
 <resources>
+    <string name="error_unknown_error">Unknown Error</string>
+    <string name="error_required_username">Username required</string>
+    <string name="error_required_password">Password required</string>
+    <string name="error_required_confirm_password">Confirm Password required</string>
+    <string name="error_required_email">Email Address required</string>
+    <string name="error_email_not_correct">Email Address is invalid</string>
+    <string name="error_required_phone_number">Phone Number required</string>
+    <string name="error_required_confirm_password_match">Password and Confirm Password does not match</string>
+    <string name="error_password_greater_than_6">Password must be greater than 6</string>
+
     <string name="app_name">Chat Chat</string>
     <string name="log_in">Log In</string>
     <string name="email_address">Email Address</string>
@@ -13,7 +23,10 @@
     <string name="get_photo_from_camera_or_gallery">Get photo from camera or gallery</string>
     <string name="camera">Camera</string>
     <string name="gallery">Gallery</string>
-
-    <string name="error_unknown_error">Unknown Error</string>
+    <string name="ok">OK</string>
+    <string name="error">Error</string>
+    <string name="success">Success</string>
+    <string name="register_success">Register successful. Please confirm your email before login.</string>
     <string name="clear">Clear</string>
+    <string name="loading">Loading...</string>
 </resources>
