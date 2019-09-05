@@ -1,4 +1,4 @@
-package com.mastertipsy.chat_chat.activity
+package com.mastertipsy.chat_chat.ui.activity
 
 import android.content.Context
 import android.content.DialogInterface
@@ -14,14 +14,13 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatImageView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.firebase.auth.FirebaseUser
 import com.mastertipsy.chat_chat.R
 import com.mastertipsy.chat_chat.model.AppConst
 import com.mastertipsy.chat_chat.model.User
-import com.mastertipsy.chat_chat.repository.RegisterRepository
+import com.mastertipsy.chat_chat.presentor.repository.RegisterRepository
 import com.mastertipsy.chat_chat.util.AlertUtil
 import com.mastertipsy.chat_chat.util.PermissionUtil
-import com.mastertipsy.chat_chat.view.RegisterView
+import com.mastertipsy.chat_chat.presentor.view.RegisterView
 
 class RegisterActivity : AppCompatActivity(), RegisterView {
     companion object {
@@ -40,8 +39,8 @@ class RegisterActivity : AppCompatActivity(), RegisterView {
     private val btnBottomSheetClear by lazy { findViewById<AppCompatButton>(R.id.btn_bottom_sheet_clear) }
     private val btnRegister by lazy { findViewById<AppCompatButton>(R.id.btn_register_send) }
     private val ivUserProfile by lazy { findViewById<AppCompatImageView>(R.id.iv_user_profile) }
-    private val layoutCameraPicker by lazy { findViewById<LinearLayout>(R.id.layout_media_picker_camera) }
-    private val layoutGalleryPicker by lazy { findViewById<LinearLayout>(R.id.layout_media_picker_gallery) }
+    //    private val layoutCameraPicker by lazy { findViewById<LinearLayout>(R.id.layout_media_picker_camera) }
+//    private val layoutGalleryPicker by lazy { findViewById<LinearLayout>(R.id.layout_media_picker_gallery) }
     private val etUsername by lazy { findViewById<AppCompatEditText>(R.id.et_register_username) }
     private val etPassword by lazy { findViewById<AppCompatEditText>(R.id.et_register_password) }
     private val etConfirmPassword by lazy { findViewById<AppCompatEditText>(R.id.et_register_confirm_password) }
@@ -84,17 +83,20 @@ class RegisterActivity : AppCompatActivity(), RegisterView {
 //        bottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
 //    }
 
-    override fun onRegisterSuccess(user: FirebaseUser) {
+    override fun onRegisterSuccess() {
         AlertUtil.showAlertDialog(
             this,
             getString(R.string.success),
             getString(R.string.register_success),
-            DialogInterface.OnClickListener { _, _ -> finish() }
+            DialogInterface.OnClickListener { dialog, _ ->
+                dialog.dismiss()
+                ChatRoomListActivity.startNewTaskClearTask(this)
+            }
         )
     }
 
-    override fun onError(errorMessage: String) {
-        AlertUtil.showAlertDialog(this, getString(R.string.error), errorMessage)
+    override fun onError(message: String) {
+        AlertUtil.showAlertDialog(this, getString(R.string.error), message)
     }
 
     private fun setupListener() {
@@ -129,7 +131,7 @@ class RegisterActivity : AppCompatActivity(), RegisterView {
                 etEmailAddress.text.toString(),
                 etPhoneNumber.text.toString()
             )
-            repo.register(user)
+            repo.createUserWithEmailAndPassword(user)
         }
     }
 

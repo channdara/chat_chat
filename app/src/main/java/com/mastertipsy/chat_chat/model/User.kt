@@ -8,11 +8,11 @@ class User(
     var phoneNumber: String
 ) {
     companion object {
-        val collection = "User"
-        val profileImage = "profileImage"
-        val username = "username"
-        val emailAddress = "emailAddress"
-        val phoneNumber = "phoneNumber"
+        const val collection = "User"
+        const val profileImage = "profileImage"
+        const val username = "username"
+        const val emailAddress = "emailAddress"
+        const val phoneNumber = "phoneNumber"
     }
 
     fun toHashMap() = hashMapOf(

@@ -17,16 +17,16 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name=".activity.ChatRoomListActivity"
+            android:name="com.mastertipsy.chat_chat.ui.activity.ChatRoomListActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.RegisterActivity"
+            android:name="com.mastertipsy.chat_chat.ui.activity.RegisterActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.LoginActivity"
+            android:name="com.mastertipsy.chat_chat.ui.activity.LoginActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.SplashActivity"
+            android:name="com.mastertipsy.chat_chat.ui.activity.SplashActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

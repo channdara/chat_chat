@@ -1,18 +1,17 @@
-package com.mastertipsy.chat_chat.activity
+package com.mastertipsy.chat_chat.ui.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
 import com.mastertipsy.chat_chat.R
-import com.mastertipsy.chat_chat.helper.SharedPreferencesHelper
 
 class SplashActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
-
-        val token = SharedPreferencesHelper.loadToken(this)
-        if (token == null) {
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user == null) {
             LoginActivity.start(this)
             return
         }
