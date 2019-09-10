@@ -1,10 +1,16 @@
 package com.mastertipsy.chat_chat.ui.activity
 
+import android.app.Activity
+import android.content.ContentValues
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Rect
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Patterns
 import android.view.MotionEvent
 import android.widget.LinearLayout
@@ -18,9 +24,10 @@ import com.mastertipsy.chat_chat.R
 import com.mastertipsy.chat_chat.model.AppConst
 import com.mastertipsy.chat_chat.model.User
 import com.mastertipsy.chat_chat.presentor.repository.RegisterRepository
-import com.mastertipsy.chat_chat.util.AlertUtil
-import com.mastertipsy.chat_chat.util.PermissionUtil
 import com.mastertipsy.chat_chat.presentor.view.RegisterView
+import com.mastertipsy.chat_chat.util.AlertUtil
+import com.mastertipsy.chat_chat.util.MediaUtil
+import java.io.ByteArrayOutputStream
 
 class RegisterActivity : AppCompatActivity(), RegisterView {
     companion object {
@@ -29,23 +36,22 @@ class RegisterActivity : AppCompatActivity(), RegisterView {
     }
 
     private lateinit var repo: RegisterRepository
-//    private lateinit var userProfile: Bitmap
 
     private val layoutBottomSheet by lazy { findViewById<LinearLayout>(R.id.layout_bottom_sheet_media_picker) }
-
+    private val layoutCameraPicker by lazy { findViewById<LinearLayout>(R.id.layout_media_picker_camera) }
+    private val layoutGalleryPicker by lazy { findViewById<LinearLayout>(R.id.layout_media_picker_gallery) }
     private val bottomSheet by lazy { BottomSheetBehavior.from(layoutBottomSheet) }
-
+    private val ivUserProfile by lazy { findViewById<AppCompatImageView>(R.id.iv_user_profile) }
     private val btnBack by lazy { findViewById<AppCompatImageButton>(R.id.btn_back) }
     private val btnBottomSheetClear by lazy { findViewById<AppCompatButton>(R.id.btn_bottom_sheet_clear) }
     private val btnRegister by lazy { findViewById<AppCompatButton>(R.id.btn_register_send) }
-    private val ivUserProfile by lazy { findViewById<AppCompatImageView>(R.id.iv_user_profile) }
-    //    private val layoutCameraPicker by lazy { findViewById<LinearLayout>(R.id.layout_media_picker_camera) }
-//    private val layoutGalleryPicker by lazy { findViewById<LinearLayout>(R.id.layout_media_picker_gallery) }
     private val etUsername by lazy { findViewById<AppCompatEditText>(R.id.et_register_username) }
     private val etPassword by lazy { findViewById<AppCompatEditText>(R.id.et_register_password) }
     private val etConfirmPassword by lazy { findViewById<AppCompatEditText>(R.id.et_register_confirm_password) }
     private val etEmailAddress by lazy { findViewById<AppCompatEditText>(R.id.et_register_email) }
     private val etPhoneNumber by lazy { findViewById<AppCompatEditText>(R.id.et_register_phone_number) }
+
+    private var imageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,22 +72,28 @@ class RegisterActivity : AppCompatActivity(), RegisterView {
         return super.dispatchTouchEvent(ev)
     }
 
-//    @Suppress("DEPRECATION")
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//        if (resultCode != Activity.RESULT_OK) return
-//        data?.let {
-//            if (requestCode == AppConst.GALLERY) {
-//                userProfile = MediaStore.Images.Media.getBitmap(contentResolver, it.data)
-//                ivUserProfile.setImageBitmap(userProfile)
-//            }
-//            if (requestCode == AppConst.CAMERA) {
-//                userProfile = it.extras?.get("data") as Bitmap
-//                ivUserProfile.setImageBitmap(userProfile)
-//            }
-//        }
-//        bottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
-//    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode != Activity.RESULT_OK) return
+        if (requestCode == AppConst.GALLERY_CODE) {
+            data?.data?.let {
+                imageUri = it
+                ivUserProfile.setImageURI(imageUri)
+            }
+        }
+        if (requestCode == AppConst.CAMERA_CODE) {
+            imageUri?.let {
+                val stream = contentResolver.openInputStream(it)
+                val tmp = BitmapFactory.decodeStream(stream)
+                val bitmap = MediaUtil.rotateBitmap(this, tmp, it)
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 80, ByteArrayOutputStream())
+                val path = MediaStore.Images.Media.insertImage(contentResolver, bitmap, "", "")
+                imageUri = Uri.parse(path)
+            }
+            ivUserProfile.setImageURI(imageUri)
+        }
+        bottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
 
     override fun onRegisterSuccess() {
         AlertUtil.showAlertDialog(
@@ -102,36 +114,36 @@ class RegisterActivity : AppCompatActivity(), RegisterView {
     private fun setupListener() {
         btnBack.setOnClickListener { onBackPressed() }
         ivUserProfile.setOnClickListener {
-            if (!PermissionUtil.isCameraGranted(this)) {
-                PermissionUtil.requestPermissions(this)
-            }
             if (bottomSheet.state == BottomSheetBehavior.STATE_COLLAPSED)
                 bottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
         }
-//        layoutCameraPicker.setOnClickListener {
-//            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-//            startActivityForResult(intent, AppConst.CAMERA)
-//        }
-//        layoutGalleryPicker.setOnClickListener {
-//            val intent = Intent(
-//                Intent.ACTION_PICK,
-//                MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-//            )
-//            startActivityForResult(intent, AppConst.GALLERY)
-//        }
+        layoutCameraPicker.setOnClickListener {
+            val externalContentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            imageUri = contentResolver.insert(externalContentUri, ContentValues())
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+            startActivityForResult(intent, AppConst.CAMERA_CODE)
+        }
+        layoutGalleryPicker.setOnClickListener {
+            val intent = Intent(
+                Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            )
+            startActivityForResult(intent, AppConst.GALLERY_CODE)
+        }
         btnBottomSheetClear.setOnClickListener {
             ivUserProfile.setImageDrawable(getDrawable(R.drawable.ic_user_hint))
         }
         btnRegister.setOnClickListener {
             if (!isAllDataValidated()) return@setOnClickListener
             val user = User(
-                "not yet implement",
+                "",
                 etUsername.text.toString(),
                 etConfirmPassword.text.toString(),
                 etEmailAddress.text.toString(),
                 etPhoneNumber.text.toString()
             )
-            repo.createUserWithEmailAndPassword(user)
+            repo.registerUser(user, imageUri)
         }
     }
 

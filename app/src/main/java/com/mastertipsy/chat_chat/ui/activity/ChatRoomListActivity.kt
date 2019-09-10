@@ -28,6 +28,7 @@ class ChatRoomListActivity : AppCompatActivity() {
         setContentView(R.layout.activity_chat_room_list)
         logout_logout.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
+            LoginActivity.startNewTaskClearTask(this)
         }
     }
 }

@@ -9,7 +9,7 @@
     <string name="error_required_confirm_password_match">Password and Confirm Password does not match</string>
     <string name="error_password_greater_than_6">Password must be greater than 6</string>
 
-    <string name="app_name">Chat Chat</string>
+    <string name="app_name">ChatChat</string>
     <string name="log_in">Log In</string>
     <string name="email_address">Email Address</string>
     <string name="password">Password</string>
