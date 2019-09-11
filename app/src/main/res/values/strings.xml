@@ -1,6 +1,7 @@
 <resources>
     <string name="error_unknown_error">Unknown Error</string>
     <string name="error_required_username">Username required</string>
+    <string name="error_username_too_long">Username is too long (max 64 char)</string>
     <string name="error_required_password">Password required</string>
     <string name="error_required_confirm_password">Confirm Password required</string>
     <string name="error_required_email">Email Address required</string>

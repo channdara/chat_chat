@@ -13,6 +13,14 @@ class User(
         const val username = "username"
         const val emailAddress = "emailAddress"
         const val phoneNumber = "phoneNumber"
+
+        fun fromHashMap(hashMap: HashMap<String, String>): User = User(
+            hashMap[profileImage] ?: "",
+            hashMap[username] ?: "",
+            "********",
+            hashMap[emailAddress] ?: "",
+            hashMap[phoneNumber] ?: ""
+        )
     }
 
     fun toHashMap() = hashMapOf(

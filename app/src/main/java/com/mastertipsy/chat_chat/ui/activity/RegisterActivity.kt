@@ -5,8 +5,6 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
@@ -27,7 +25,7 @@ import com.mastertipsy.chat_chat.presentor.repository.RegisterRepository
 import com.mastertipsy.chat_chat.presentor.view.RegisterView
 import com.mastertipsy.chat_chat.util.AlertUtil
 import com.mastertipsy.chat_chat.util.MediaUtil
-import java.io.ByteArrayOutputStream
+import java.io.File
 
 class RegisterActivity : AppCompatActivity(), RegisterView {
     companion object {
@@ -52,6 +50,7 @@ class RegisterActivity : AppCompatActivity(), RegisterView {
     private val etPhoneNumber by lazy { findViewById<AppCompatEditText>(R.id.et_register_phone_number) }
 
     private var imageUri: Uri? = null
+    private var imageFile: File? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,22 +74,16 @@ class RegisterActivity : AppCompatActivity(), RegisterView {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode != Activity.RESULT_OK) return
-        if (requestCode == AppConst.GALLERY_CODE) {
-            data?.data?.let {
-                imageUri = it
-                ivUserProfile.setImageURI(imageUri)
-            }
+        val uri = if (requestCode == AppConst.GALLERY_CODE) {
+            data?.data
+        } else {
+            imageUri
         }
-        if (requestCode == AppConst.CAMERA_CODE) {
-            imageUri?.let {
-                val stream = contentResolver.openInputStream(it)
-                val tmp = BitmapFactory.decodeStream(stream)
-                val bitmap = MediaUtil.rotateBitmap(this, tmp, it)
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 80, ByteArrayOutputStream())
-                val path = MediaStore.Images.Media.insertImage(contentResolver, bitmap, "", "")
-                imageUri = Uri.parse(path)
+        uri?.let {
+            MediaUtil.compressImage(this, it)?.let { bitmap ->
+                ivUserProfile.setImageBitmap(bitmap)
+                imageFile = MediaUtil.createImageFile(this, bitmap)
             }
-            ivUserProfile.setImageURI(imageUri)
         }
         bottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
     }
@@ -118,9 +111,12 @@ class RegisterActivity : AppCompatActivity(), RegisterView {
                 bottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
         }
         layoutCameraPicker.setOnClickListener {
-            val externalContentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            imageUri = contentResolver.insert(externalContentUri, ContentValues())
             val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            val externalContentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            val contentValues = ContentValues().apply {
+                put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            }
+            imageUri = this.contentResolver.insert(externalContentUri, contentValues)
             intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
             startActivityForResult(intent, AppConst.CAMERA_CODE)
         }
@@ -133,6 +129,7 @@ class RegisterActivity : AppCompatActivity(), RegisterView {
         }
         btnBottomSheetClear.setOnClickListener {
             ivUserProfile.setImageDrawable(getDrawable(R.drawable.ic_user_hint))
+            imageUri = null
         }
         btnRegister.setOnClickListener {
             if (!isAllDataValidated()) return@setOnClickListener
@@ -143,13 +140,19 @@ class RegisterActivity : AppCompatActivity(), RegisterView {
                 etEmailAddress.text.toString(),
                 etPhoneNumber.text.toString()
             )
-            repo.registerUser(user, imageUri)
+            val uri = Uri.fromFile(imageFile)
+            repo.registerUser(user, uri)
         }
     }
 
     private fun isAllDataValidated(): Boolean {
         if (etUsername.text.isNullOrEmpty()) {
             etUsername.error = getString(R.string.error_required_username)
+            etUsername.requestFocus()
+            return false
+        }
+        if (etUsername.text.toString().length > 64) {
+            etUsername.error = getString(R.string.error_username_too_long)
             etUsername.requestFocus()
             return false
         }
