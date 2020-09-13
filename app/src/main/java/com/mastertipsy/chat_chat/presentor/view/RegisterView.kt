@@ -1,5 +1,5 @@
 package com.mastertipsy.chat_chat.presentor.view
 
 interface RegisterView : BaseView {
-    fun onRegisterSuccess()
+    fun onRegisterSuccess(email: String)
 }

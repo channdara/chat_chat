@@ -42,8 +42,8 @@ class LoginActivity : AppCompatActivity(), LoginView {
         setupListener()
     }
 
-    override fun onLoginSuccess() {
-        ChatRoomListActivity.startNewTaskClearTask(this)
+    override fun onLoginSuccess(email: String) {
+        ChatRoomListActivity.startNewTaskClearTask(this, email)
     }
 
     override fun onError(message: String) {

@@ -1,11 +1,12 @@
 package com.mastertipsy.chat_chat.model
 
 class User(
-    var profileImage: String,
-    var username: String,
-    var password: String,
-    var emailAddress: String,
-    var phoneNumber: String
+    var userID: String = "",
+    var profileImage: String = "",
+    var username: String = "",
+    var password: String = "",
+    var emailAddress: String = "",
+    var phoneNumber: String = ""
 ) {
     companion object {
         const val collection = "User"
@@ -14,16 +15,17 @@ class User(
         const val emailAddress = "emailAddress"
         const val phoneNumber = "phoneNumber"
 
-        fun fromHashMap(hashMap: HashMap<String, String>): User = User(
-            hashMap[profileImage] ?: "",
-            hashMap[username] ?: "",
+        fun fromMap(id: String, map: Map<String, Any>): User = User(
+            id,
+            map[profileImage] as String,
+            map[username] as String,
             "********",
-            hashMap[emailAddress] ?: "",
-            hashMap[phoneNumber] ?: ""
+            map[emailAddress] as String,
+            map[phoneNumber] as String
         )
     }
 
-    fun toHashMap() = hashMapOf(
+    fun toMap() = hashMapOf(
         User.profileImage to profileImage,
         User.username to username,
         User.emailAddress to emailAddress,

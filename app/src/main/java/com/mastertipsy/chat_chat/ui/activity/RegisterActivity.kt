@@ -88,14 +88,14 @@ class RegisterActivity : AppCompatActivity(), RegisterView {
         bottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 
-    override fun onRegisterSuccess() {
+    override fun onRegisterSuccess(email: String) {
         AlertUtil.showAlertDialog(
             this,
             getString(R.string.success),
             getString(R.string.register_success),
             DialogInterface.OnClickListener { dialog, _ ->
                 dialog.dismiss()
-                ChatRoomListActivity.startNewTaskClearTask(this)
+                ChatRoomListActivity.startNewTaskClearTask(this, email)
             }
         )
     }
@@ -134,12 +134,15 @@ class RegisterActivity : AppCompatActivity(), RegisterView {
         btnRegister.setOnClickListener {
             if (!isAllDataValidated()) return@setOnClickListener
             val user = User(
-                "",
-                etUsername.text.toString(),
-                etConfirmPassword.text.toString(),
-                etEmailAddress.text.toString(),
-                etPhoneNumber.text.toString()
+                username = etUsername.text.toString(),
+                password = etConfirmPassword.text.toString(),
+                emailAddress = etEmailAddress.text.toString(),
+                phoneNumber = etPhoneNumber.text.toString()
             )
+            if (imageFile == null) {
+                repo.registerUser(user, null)
+                return@setOnClickListener
+            }
             val uri = Uri.fromFile(imageFile)
             repo.registerUser(user, uri)
         }

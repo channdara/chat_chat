@@ -31,4 +31,6 @@
     <string name="clear">Clear</string>
     <string name="loading">Loading…</string>
     <string name="logout">Logout</string>
+    <string name="hi">Hi</string>
+    <string name="search_user">Search user</string>
 </resources>

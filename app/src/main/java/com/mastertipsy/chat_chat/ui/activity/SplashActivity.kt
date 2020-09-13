@@ -31,6 +31,6 @@ class SplashActivity : AppCompatActivity() {
             LoginActivity.start(this)
             return
         }
-        ChatRoomListActivity.start(this)
+        ChatRoomListActivity.start(this, user.email ?: "")
     }
 }

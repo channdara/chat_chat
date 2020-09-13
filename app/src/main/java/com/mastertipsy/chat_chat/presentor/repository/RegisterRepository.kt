@@ -6,16 +6,17 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.mastertipsy.chat_chat.R
+import com.mastertipsy.chat_chat.helper.SharedPrefHelper
 import com.mastertipsy.chat_chat.model.User
 import com.mastertipsy.chat_chat.presentor.view.RegisterView
 import com.mastertipsy.chat_chat.util.AlertUtil
 import com.mastertipsy.chat_chat.util.TextUtil
 
-class RegisterRepository(context: Context, private val view: RegisterView) {
+class RegisterRepository(private val context: Context, private val view: RegisterView) {
     private val auth = FirebaseAuth.getInstance()
+    private val storage = FirebaseStorage.getInstance()
+    private val firestore = FirebaseFirestore.getInstance()
     private val dialog = AlertUtil.progressDialog(context)
-    private val storageInstance = FirebaseStorage.getInstance()
-    private val firestoreInstance = FirebaseFirestore.getInstance()
     private val unknownError = context.getString(R.string.error_unknown_error)
     private val storagePath = "UserProfile"
 
@@ -39,10 +40,10 @@ class RegisterRepository(context: Context, private val view: RegisterView) {
             return
         }
         val imageName = "$storagePath/${TextUtil.getCurrentDateTime()}"
-        storageInstance.reference.child(imageName).putFile(image)
+        storage.reference.child(imageName).putFile(image)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    storageInstance.reference.child(imageName)
+                    storage.reference.child(imageName)
                         .downloadUrl.addOnCompleteListener { uri ->
                         user.profileImage = uri.result.toString()
                         addUserToFirestore(user)
@@ -55,10 +56,24 @@ class RegisterRepository(context: Context, private val view: RegisterView) {
     }
 
     private fun addUserToFirestore(user: User) {
-        firestoreInstance.collection(User.collection).add(user.toHashMap())
+        firestore.collection(User.collection).add(user.toMap())
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    view.onRegisterSuccess()
+                    saveUserID(user.emailAddress)
+                    return@addOnCompleteListener
+                }
+                view.onError(task.exception?.message ?: unknownError)
+                dialog.dismiss()
+            }
+    }
+
+    private fun saveUserID(email: String) {
+        firestore.collection(User.collection).whereEqualTo(User.emailAddress, email).get()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val uid = task.result?.documents?.get(0)?.id ?: ""
+                    SharedPrefHelper.saveUserID(context, uid)
+                    view.onRegisterSuccess(email)
                     dialog.dismiss()
                     return@addOnCompleteListener
                 }
